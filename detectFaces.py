@@ -23,7 +23,7 @@ def recognizeFace(frame):
 
     label, confidence = recognizer.predict(face_gray)
 
-    name = chr(label) if confidence > 80 else "Unkown Person"
+    name = chr(label) if confidence > 80 else "Unknown Person"
     text = f'{name} - {confidence: .2f}%'
 
     cv2.putText(frame, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
