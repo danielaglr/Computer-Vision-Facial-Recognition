@@ -1,34 +1,57 @@
-import cv2
 import os
+import pandas as pd
 import numpy as np
+import pickle
+import keras
 
-def trainFaces(dataset):
-  faces, labels = [], []
+import matplotlib.pyplot as plt
 
-  print("Training faces. This might take a while.")
+from keras.layers import Dense, GlobalAveragePooling2D
+from keras.preprocessing import image
+from keras.preprocessing.image import ImageDataGenerator
+from keras.applications.mobilenet import preprocess_input
+from keras.models import Model
+from keras.optimizers import Adam
 
-  for person in os.listdir(dataset):
-    person_dir = os.path.join(dataset, person)
+from keras_vggface.vggface import VGGFace
 
-    if os.path.isdir(person_dir):
-      for filename in os.listdir(person_dir):
-        if filename.endswith(".jpg"):
-          image_path = os.path.join(person_dir, filename)
-          image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+train_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
+train_generator = train_datagen.flow_from_directory("data\\datasets", target_size=(244, 244), color_mode="rgb", batch_size=32, class_mode="categorical", shuffle=True)
 
-          label = int(ord(person[0]))
+train_generator.class_indices.values()
+NO_CLASSES = len(train_generator.class_indices.values())
 
-          faces.append(image)
-          labels.append(label)
+base_model = VGGFace(include_top=False, model="vgg16", input_shape=(244, 244, 3))
+base_model.summary()
 
+x = base_model.output
+x = GlobalAveragePooling2D()(x)
 
-  faces = np.array(faces)
-  labels = np.array(labels)
+x = Dense(1024, activation="relu")(x)
+x = Dense(1024, activation="relu")(x)
+x = Dense(512, activation="relu")(x)
 
-  recognizer = cv2.face.LBPHFaceRecognizer.create()
+preds = Dense(NO_CLASSES, activation="softmax")(x)
 
-  recognizer.train(faces, labels)
+model = Model(inputs = base_model.input, outputs = preds)
+model.summary()
 
-  recognizer.save("data\\face_recognizer.yml")
+for layer in model.layers[:19]:
+  layer.trainable = False
 
-trainFaces("data\\datasets")
+for layer in model.layers[19:]:
+  layer.trainable = True
+
+model.compile(optimizer="Adam", loss="categorical_crossentropy", metrics=["accuracy"])
+
+model.fit(train_generator, batch_size=1, verbose=1, epochs=20)
+
+model.save("trained_face_cnn_model.h5")
+
+class_dict = train_generator.class_indices
+class_dict = {
+  value: key for key, value in class_dict.items()
+}
+
+face_label_file = "data\\faceLabels.pickle"
+with open(face_label_file, "wb") as f: pickle.dump(class_dict, f)
