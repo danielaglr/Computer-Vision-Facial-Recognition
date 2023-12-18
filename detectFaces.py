@@ -1,8 +1,8 @@
 import cv2
-from keras.models import load_model
-
 import pickle
 import numpy as np
+
+from keras.models import load_model
 
 IMAGE_WIDTH = 244
 IMAGE_HEIGHT = 244
@@ -26,6 +26,7 @@ while True:
   ret, frame = live_video.read()
 
   faces = face_cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), scaleFactor=1.3, minNeighbors=5)
+
 
   for (x, y, w, h) in faces: 
     roi_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)[y: y + h, x: x + w]
