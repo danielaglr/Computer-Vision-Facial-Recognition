@@ -15,7 +15,16 @@ from keras.optimizers import Adam
 
 from keras_vggface.vggface import VGGFace
 
-train_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
+train_datagen = ImageDataGenerator(
+  preprocessing_function=preprocess_input, 
+  rotation_range=20, 
+  width_shift_range=0.2, 
+  height_shift_range=0.2, 
+  shear_range=0.2,
+  zoom_range=0.2,
+  horizontal_flip=True,
+  fill_mode="nearest"
+)
 train_generator = train_datagen.flow_from_directory("data\\datasets", target_size=(244, 244), color_mode="rgb", batch_size=32, class_mode="categorical", shuffle=True)
 
 train_generator.class_indices.values()
@@ -46,7 +55,7 @@ model.compile(optimizer="Adam", loss="categorical_crossentropy", metrics=["accur
 
 model.fit(train_generator, batch_size=1, verbose=1, epochs=20)
 
-model.save("trained_face_cnn_model.h5")
+model.save("data\\trained_face_cnn_model.h5")
 
 class_dict = train_generator.class_indices
 class_dict = {
