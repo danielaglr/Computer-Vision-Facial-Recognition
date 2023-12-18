@@ -41,10 +41,8 @@ for root, _, files in os.walk(FACES_DIR):
       for (x, y, w, h) in faces:
         face_detect = cv2.rectangle(image_test, (x, y), (x + w, y + h), (255, 0, 255), 2)
         
-        plt.imshow(face_detect)
-
         size = (IMAGE_WIDTH, IMAGE_HEIGHT)
-        roi = image_array[x: x + w, y: y + h]
+        roi = image_array[y: y + h, x: x + w]
 
         resized_image = cv2.resize(roi, size)
         image_array = np.array(resized_image, "uint8")
