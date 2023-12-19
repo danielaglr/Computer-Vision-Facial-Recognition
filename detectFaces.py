@@ -27,7 +27,6 @@ while True:
 
   faces = face_cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), scaleFactor=1.3, minNeighbors=5)
 
-
   for (x, y, w, h) in faces: 
     roi_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)[y: y + h, x: x + w]
     
@@ -47,7 +46,7 @@ while True:
 
     cv2.putText(frame, f'({name})', (x, y - 10), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 255), 2, cv2.LINE_AA)
 
-  cv2.imshow("Image", frame)
+  cv2.imshow("Facial Recognition", frame)
   
   key = cv2.waitKey(1) & 0xFF
   if key == ord("q"):
