@@ -1,10 +1,7 @@
 import cv2
 import os
-import pickle
 import numpy as np
 from PIL import Image
-
-import matplotlib.pyplot as plt
 
 FACES_DIR = "data\\datasets"
 
